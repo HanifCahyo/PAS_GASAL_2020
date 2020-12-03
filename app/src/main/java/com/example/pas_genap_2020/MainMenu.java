@@ -11,6 +11,7 @@ public class MainMenu extends AppCompatActivity {
 
     CardView menu1;
     CardView menu2;
+    CardView menu3;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +29,14 @@ public class MainMenu extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 startActivity(new Intent(getApplicationContext(), ListTeamFavourite.class));
+            }
+        });
+
+        menu3 = (CardView)findViewById(R.id.menu3);
+        menu3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                startActivity(new Intent(getApplicationContext(), ListMatch.class));
             }
         });
     }

@@ -14,7 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.PAS_Genap_2020">
-        <activity android:name=".DetailFavourite"></activity>
+        <activity android:name=".ListMatch"></activity>
+        <activity android:name=".DetailFavourite" />
         <activity android:name=".DetailTeam" />
         <activity android:name=".ListTeamFavourite" />
         <activity android:name=".ListTeam" />

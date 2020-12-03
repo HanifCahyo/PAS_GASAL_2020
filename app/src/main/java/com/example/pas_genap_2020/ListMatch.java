@@ -14,6 +14,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.androidnetworking.AndroidNetworking;
+import com.androidnetworking.common.ANRequest;
 import com.androidnetworking.common.Priority;
 import com.androidnetworking.error.ANError;
 import com.androidnetworking.interfaces.JSONObjectRequestListener;
@@ -24,21 +25,22 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-public class ListTeam extends AppCompatActivity {
+public class ListMatch extends AppCompatActivity {
 
     TextView tvnodata;
     ProgressDialog dialog;
     RecyclerView recyclerView;
-    DataAdapter adapter;
-    ArrayList<Model> DataArrayList; //kit add kan ke adapter
+    AdapterMatch adapter;
+    ArrayList<ModelMatch> DataArrayList; //kit add kan ke adapter
     ImageView tambah_data;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setTitle("Match List");
         setContentView(R.layout.activity_list_team);
         recyclerView = (RecyclerView) findViewById(R.id.rvdata);
-        dialog = new ProgressDialog(ListTeam.this);
+        dialog = new ProgressDialog(ListMatch.this);
         tvnodata = (TextView) findViewById(R.id.tvnodata);
         tvnodata.setVisibility(View.GONE);
         recyclerView.setVisibility(View.VISIBLE);
@@ -49,8 +51,8 @@ public class ListTeam extends AppCompatActivity {
         //Loading Screen
         dialog.setMessage("Processing Data");
         dialog.show();
-        //Backround Process
-        AndroidNetworking.get("https://www.thesportsdb.com/api/v1/json/1/search_all_teams.php?l=English%20Premier%20League")
+        //Background Process
+        AndroidNetworking.get("https://www.thesportsdb.com/api/v1/json/1/eventslast.php?id=133613")
                 .setTag("test")
                 .setPriority(Priority.LOW)
                 .build()
@@ -60,39 +62,37 @@ public class ListTeam extends AppCompatActivity {
                         //Do Anything With Response
                         Log.d("hasiljson","onResponse: " + response.toString());
                         DataArrayList = new ArrayList<>();
-                        Model modelku;
+                        ModelMatch modelku;
                         try {
                             Log.d("hasiljson", "onResponse: " + response.toString());
-                            JSONArray jsonArray = response.getJSONArray("teams");
+                            JSONArray jsonArray = response.getJSONArray("results");
                             Log.d("hasiljson2", "onResponse: " + jsonArray.toString());
                             for (int i = 0; i < jsonArray.length(); i++) {
-                                modelku = new Model();
+                                modelku = new ModelMatch();
                                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                                modelku.setTeam_name(jsonObject.getString("strTeam"));
-                                modelku.setAlternate_name(jsonObject.getString("strAlternate"));
+                                modelku.setHome_name(jsonObject.getString("strHomeTeam"));
+                                modelku.setAway_name(jsonObject.getString("strAwayTeam"));
                                 modelku.setLeague(jsonObject.getString("strLeague"));
-                                modelku.setStadium(jsonObject.getString("strStadium"));
-                                modelku.setBadge_path(jsonObject.getString("strTeamBadge"));
-                                modelku.setDescription(jsonObject.getString("strDescriptionEN"));
-                                modelku.setStadium_location(jsonObject.getString("strStadiumLocation"));
+                                modelku.setVenue(jsonObject.getString("strVenue"));
+                                modelku.setHome_score(jsonObject.getInt("intHomeScore"));
+                                modelku.setAway_score(jsonObject.getInt("intAwayScore"));
                                 DataArrayList.add(modelku);
                             }
                             //Handle Click
-                            adapter = new DataAdapter(DataArrayList, new DataAdapter.Callback() {
+                            adapter = new AdapterMatch(DataArrayList, new AdapterMatch.Callback() {
                                 @Override
                                 public void onClick(int position) {
-                                    Model team = DataArrayList.get(position);
+                                    ModelMatch team = DataArrayList.get(position);
                                     Intent intent = new Intent(getApplicationContext(), DetailTeam.class);
                                     intent.putExtra("id",team.id);
-                                    intent.putExtra("team",team.strTeam);
-                                    intent.putExtra("alternate",team.strAlternate);
+                                    intent.putExtra("home",team.strHomeTeam);
+                                    intent.putExtra("away",team.strAwayTeam);
                                     intent.putExtra("league",team.strLeague);
-                                    intent.putExtra("stadium",team.strStadium);
-                                    intent.putExtra("badge",team.strTeamBadge);
-                                    intent.putExtra("description",team.strDescriptionEN);
-                                    intent.putExtra("location",team.strStadiumLocation);
+                                    intent.putExtra("venue",team.strVenue);
+                                    intent.putExtra("homescore",team.intHomeScore);
+                                    intent.putExtra("awayscore",team.intAwayScore);
                                     startActivity(intent);
-                                    Toast.makeText(ListTeam.this, ""+position, Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(ListMatch.this, +position, Toast.LENGTH_SHORT).show();
                                 }
 
                                 @Override
@@ -100,7 +100,7 @@ public class ListTeam extends AppCompatActivity {
 
                                 }
                             });
-                            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ListTeam.this);
+                            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(ListMatch.this);
                             recyclerView.setLayoutManager(layoutManager);
                             recyclerView.setAdapter(adapter);
                             if (dialog.isShowing()) {
@@ -114,7 +114,6 @@ public class ListTeam extends AppCompatActivity {
                         }
 
                     }
-
 
                     @Override
                     public void onError(ANError anError) {
